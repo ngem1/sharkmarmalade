@@ -14,7 +14,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadManager
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.source.preload.DefaultPreloadManager
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.preference.PreferenceManager
@@ -22,6 +22,7 @@ import be.bendardenne.jellyfin.aaos.JellyfinMediaLibrarySessionCallback.Companio
 import be.bendardenne.jellyfin.aaos.JellyfinMediaLibrarySessionCallback.Companion.PLAYLIST_TRACK_POSITON_MS_PREF
 import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.OFFLINE_DOWNLOADS
 import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.ROOT_ID
+import be.bendardenne.jellyfin.aaos.offline.JellyfinQueuePreloadTargetControl
 import be.bendardenne.jellyfin.aaos.offline.OfflineDownloads
 import be.bendardenne.jellyfin.aaos.SharkMarmaladeConstants.LOG_MARKER
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,6 +31,7 @@ import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.playStateApi
 import org.jellyfin.sdk.model.serializer.toUUID
 import javax.inject.Inject
+import kotlin.math.min
 
 @AndroidEntryPoint
 @OptIn(UnstableApi::class)
@@ -43,15 +45,19 @@ class JellyfinMusicService : MediaLibraryService() {
 
     private lateinit var accountManager: JellyfinAccountManager
     private lateinit var jellyfinApi: ApiClient
-    private lateinit var mediaSourceFactory: DefaultMediaSourceFactory
     private lateinit var mediaLibrarySession: MediaLibrarySession
     private lateinit var callback: JellyfinMediaLibrarySessionCallback
+    private lateinit var preloadManager: DefaultPreloadManager
+    private lateinit var preloadTargetControl: JellyfinQueuePreloadTargetControl
 
     private val handler: Handler = Handler(Looper.getMainLooper())
-    private var currentPlaybackTime: Long = 0;
-    private var currentTrack: MediaItem? = null;
+    private var currentPlaybackTime: Long = 0
+    private var currentTrack: MediaItem? = null
 
     private lateinit var playbackPoll: Runnable
+
+    /** Fingerprint of queue contents (not current index) to decide full preload reset vs index-only update. */
+    private var lastPreloadQueueSignature: String? = null
 
     private val downloadManagerListener = object : DownloadManager.Listener {
         override fun onDownloadChanged(
@@ -65,9 +71,10 @@ class JellyfinMusicService : MediaLibraryService() {
 
     private val playerListener = object : Player.Listener {
         override fun onEvents(player: Player, events: Player.Events) {
+            if (events.contains(Player.EVENT_TIMELINE_CHANGED)) {
+                maybeSyncPreloadManager(player)
+            }
             if (events.contains(Player.EVENT_MEDIA_ITEM_TRANSITION)) {
-                // Persist the current index of the queue in the preferences.
-                // This is restored in onPlaybackResumption
                 PreferenceManager.getDefaultSharedPreferences(this@JellyfinMusicService).edit {
                     putInt(PLAYLIST_INDEX_PREF, player.currentMediaItemIndex)
                 }
@@ -84,20 +91,21 @@ class JellyfinMusicService : MediaLibraryService() {
 
         accountManager = JellyfinAccountManager(AccountManager.get(applicationContext))
         jellyfinApi = jellyfin.createApi()
-        mediaSourceFactory = DefaultMediaSourceFactory(this)
 
-        val player = ExoPlayer.Builder(this)
-            .setAudioAttributes(AudioAttributes.DEFAULT, true)
-            .setMediaSourceFactory(mediaSourceFactory)
-            .build()
+        preloadTargetControl = JellyfinQueuePreloadTargetControl()
+        val preloadBuilder = DefaultPreloadManager.Builder(this, preloadTargetControl)
+            .setCache(offlineDownloads.sharedMediaCache())
+            .setDataSourceFactory(offlineDownloads.upstreamHttpDataSourceFactory())
+
+        val player = preloadBuilder.buildExoPlayer(
+            ExoPlayer.Builder(this).setAudioAttributes(AudioAttributes.DEFAULT, true),
+        )
+        preloadManager = preloadBuilder.build()
 
         player.addListener(playerListener)
 
-        // Start in no repeat & no shuffle by default
         player.repeatMode = Player.REPEAT_MODE_OFF
         player.shuffleModeEnabled = false
-        // TODO  double check if we can't get events for this
-        // https://proandroiddev.com/mastering-playback-state-with-exo-player-977016aa5003
         pollForPlaybackStatus(player)
 
         callback = JellyfinMediaLibrarySessionCallback(this, accountManager, jellyfinApi, offlineDownloads)
@@ -113,9 +121,53 @@ class JellyfinMusicService : MediaLibraryService() {
         }
     }
 
+    private fun maybeSyncPreloadManager(player: Player) {
+        if (!accountManager.isAuthenticated || player !is ExoPlayer) {
+            return
+        }
+        val count = player.mediaItemCount
+        val signature = buildString {
+            append(count)
+            append('|')
+            for (i in 0 until count) {
+                append(player.getMediaItemAt(i).mediaId)
+                append(',')
+            }
+        }
+        if (signature == lastPreloadQueueSignature) {
+            updatePreloadPlayingIndex(player)
+            return
+        }
+        lastPreloadQueueSignature = signature
+        syncPreloadManagerFullQueue(player)
+    }
+
+    private fun syncPreloadManagerFullQueue(player: ExoPlayer) {
+        preloadManager.reset()
+        val n = player.mediaItemCount
+        if (n == 0) {
+            return
+        }
+        val limit = min(n, 40)
+        for (i in 0 until limit) {
+            preloadManager.add(player.getMediaItemAt(i), i)
+        }
+        val idx = player.currentMediaItemIndex.coerceIn(0, limit - 1)
+        preloadTargetControl.currentPlayingIndex = idx
+        preloadManager.setCurrentPlayingIndex(idx)
+        preloadManager.invalidate()
+    }
+
+    private fun updatePreloadPlayingIndex(player: Player) {
+        if (player.mediaItemCount == 0) {
+            return
+        }
+        preloadTargetControl.currentPlayingIndex = player.currentMediaItemIndex
+        preloadManager.setCurrentPlayingIndex(player.currentMediaItemIndex)
+        preloadManager.invalidate()
+    }
+
     private fun pollForPlaybackStatus(player: ExoPlayer) {
-        // Repeatedly poll the player for current elapsed playback time
-        // We need this to report elapsed time on playback stop, which is needed for scrobbling.
         playbackPoll = Runnable {
             if (player.isPlaying) {
                 currentPlaybackTime = player.currentPosition
@@ -142,21 +194,22 @@ class JellyfinMusicService : MediaLibraryService() {
         mediaLibrarySession.release()
         mediaLibrarySession.player.removeListener(playerListener)
         mediaLibrarySession.player.release()
+        preloadManager.release()
         handler.removeCallbacks(playbackPoll)
         super.onDestroy()
     }
 
     fun onLogin() {
         jellyfinApi.auth(accountManager)
-        mediaSourceFactory.setDataSourceFactory(offlineDownloads.playbackCacheDataSourceFactory())
 
         // Trigger a refresh upon login.
         mediaLibrarySession.notifyChildrenChanged(ROOT_ID, 5, null)
+
+        maybeSyncPreloadManager(mediaLibrarySession.player)
     }
 
     private suspend fun reportPlayback(player: Player) {
         val exoPlayer = player as ExoPlayer
-        // MediaItem has changed; if there was a previous item playing, mark it stopped.
         if (currentTrack != null) {
             Log.i(LOG_MARKER, "Reporting playback stopped: ${currentPlaybackTime}")
             jellyfinApi.playStateApi.onPlaybackStopped(

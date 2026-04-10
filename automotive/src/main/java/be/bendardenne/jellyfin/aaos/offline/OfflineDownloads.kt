@@ -37,7 +37,7 @@ class OfflineDownloads @Inject constructor(
 
     private val databaseProvider = StandaloneDatabaseProvider(context)
 
-    private val downloadCache: SimpleCache by lazy {
+    private val sharedCache: SimpleCache by lazy {
         val dir = File(context.filesDir, "sharkmarmalade_downloads").apply { mkdirs() }
         SimpleCache(dir, NoOpCacheEvictor(), databaseProvider)
     }
@@ -53,7 +53,7 @@ class OfflineDownloads @Inject constructor(
         DownloadManager(
             context,
             databaseProvider,
-            downloadCache,
+            sharedCache,
             upstreamFactory,
             Runnable::run,
         ).apply {
@@ -61,10 +61,16 @@ class OfflineDownloads @Inject constructor(
         }
     }
 
+    /** Same disk cache used by downloads, playback, and [androidx.media3.exoplayer.source.preload.DefaultPreloadManager]. */
+    fun sharedMediaCache(): SimpleCache = sharedCache
+
+    /** Upstream HTTP factory with Jellyfin auth (refreshed on each [DataSource] creation). */
+    fun upstreamHttpDataSourceFactory(): DataSource.Factory = upstreamFactory
+
     @OptIn(UnstableApi::class)
     fun playbackCacheDataSourceFactory(): CacheDataSource.Factory {
         return CacheDataSource.Factory()
-            .setCache(downloadCache)
+            .setCache(sharedCache)
             .setUpstreamDataSourceFactory(upstreamFactory)
             .setCacheWriteDataSinkFactory(null)
     }
