@@ -28,4 +28,7 @@
     <string name="album_behaviour">Album behaviour</string>
     <string name="upload_logs">Upload logs to Jellyfin server</string>
     <string name="log_uploaded">Logfile uploaded to server</string>
+    <string name="offline_downloads">Offline downloads</string>
+    <string name="download_notification_channel_name">Music downloads</string>
+    <string name="download_notification_channel_description">Shows progress when saving tracks for offline playback</string>
 </resources>

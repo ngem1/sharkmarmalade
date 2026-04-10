@@ -11,15 +11,18 @@ import androidx.media3.common.AudioAttributes
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.offline.Download
+import androidx.media3.exoplayer.offline.DownloadManager
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.preference.PreferenceManager
 import be.bendardenne.jellyfin.aaos.JellyfinMediaLibrarySessionCallback.Companion.PLAYLIST_INDEX_PREF
 import be.bendardenne.jellyfin.aaos.JellyfinMediaLibrarySessionCallback.Companion.PLAYLIST_TRACK_POSITON_MS_PREF
+import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.OFFLINE_DOWNLOADS
 import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.ROOT_ID
+import be.bendardenne.jellyfin.aaos.offline.OfflineDownloads
 import be.bendardenne.jellyfin.aaos.SharkMarmaladeConstants.LOG_MARKER
 import dagger.hilt.android.AndroidEntryPoint
 import org.jellyfin.sdk.Jellyfin
@@ -35,6 +38,9 @@ class JellyfinMusicService : MediaLibraryService() {
     @Inject
     lateinit var jellyfin: Jellyfin
 
+    @Inject
+    lateinit var offlineDownloads: OfflineDownloads
+
     private lateinit var accountManager: JellyfinAccountManager
     private lateinit var jellyfinApi: ApiClient
     private lateinit var mediaSourceFactory: DefaultMediaSourceFactory
@@ -45,8 +51,17 @@ class JellyfinMusicService : MediaLibraryService() {
     private var currentPlaybackTime: Long = 0;
     private var currentTrack: MediaItem? = null;
 
-    private lateinit var playbackPoll: Runnable;
+    private lateinit var playbackPoll: Runnable
 
+    private val downloadManagerListener = object : DownloadManager.Listener {
+        override fun onDownloadChanged(
+            downloadManager: DownloadManager,
+            download: Download,
+            finalException: Exception?,
+        ) {
+            mediaLibrarySession.notifyChildrenChanged(OFFLINE_DOWNLOADS, Int.MAX_VALUE, null)
+        }
+    }
 
     private val playerListener = object : Player.Listener {
         override fun onEvents(player: Player, events: Player.Events) {
@@ -85,11 +100,13 @@ class JellyfinMusicService : MediaLibraryService() {
         // https://proandroiddev.com/mastering-playback-state-with-exo-player-977016aa5003
         pollForPlaybackStatus(player)
 
-        callback = JellyfinMediaLibrarySessionCallback(this, accountManager, jellyfinApi)
+        callback = JellyfinMediaLibrarySessionCallback(this, accountManager, jellyfinApi, offlineDownloads)
 
         mediaLibrarySession = MediaLibrarySession.Builder(this, player, callback)
             .setMediaButtonPreferences(CommandButtons.createButtons(player))
             .build()
+
+        offlineDownloads.downloadManager.addListener(downloadManagerListener)
 
         if (accountManager.isAuthenticated) {
             onLogin()
@@ -121,6 +138,7 @@ class JellyfinMusicService : MediaLibraryService() {
     override fun onDestroy() {
         Log.i(LOG_MARKER, "onDestroy")
 
+        offlineDownloads.downloadManager.removeListener(downloadManagerListener)
         mediaLibrarySession.release()
         mediaLibrarySession.player.removeListener(playerListener)
         mediaLibrarySession.player.release()
@@ -129,13 +147,11 @@ class JellyfinMusicService : MediaLibraryService() {
     }
 
     fun onLogin() {
-        val headers = jellyfinApi.auth(accountManager)
-
-        val authedFactory = DefaultHttpDataSource.Factory().setDefaultRequestProperties(headers)
-        mediaSourceFactory.setDataSourceFactory(authedFactory)
+        jellyfinApi.auth(accountManager)
+        mediaSourceFactory.setDataSourceFactory(offlineDownloads.playbackCacheDataSourceFactory())
 
         // Trigger a refresh upon login.
-        mediaLibrarySession.notifyChildrenChanged(ROOT_ID, 4, null)
+        mediaLibrarySession.notifyChildrenChanged(ROOT_ID, 5, null)
     }
 
     private suspend fun reportPlayback(player: Player) {

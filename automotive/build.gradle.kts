@@ -55,6 +55,7 @@ dependencies {
     implementation("androidx.credentials:credentials:1.5.0")
     implementation("androidx.databinding:databinding-runtime:9.1.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")
+    implementation("androidx.media3:media3-database:1.9.2")
     implementation("androidx.media3:media3-exoplayer:1.9.2")
     implementation("androidx.media3:media3-session:1.9.2")
     implementation("androidx.media3:media3-ui:1.9.2")

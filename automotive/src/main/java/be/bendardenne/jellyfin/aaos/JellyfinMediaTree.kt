@@ -6,9 +6,11 @@ import androidx.media3.common.MediaMetadata.MEDIA_TYPE_ARTIST
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_PLAYLIST
 import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.FAVOURITES
 import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.LATEST_ALBUMS
+import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.OFFLINE_DOWNLOADS
 import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.PLAYLISTS
 import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.RANDOM_ALBUMS
 import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.ROOT_ID
+import be.bendardenne.jellyfin.aaos.offline.OfflineDownloads
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import org.jellyfin.sdk.api.client.ApiClient
@@ -26,6 +28,7 @@ class JellyfinMediaTree(
     private val context: Context,
     private val api: ApiClient,
     private val itemFactory: MediaItemFactory,
+    private val offlineDownloads: OfflineDownloads,
     private val maxItemsPerPage: Int = 120
 ) {
 
@@ -42,10 +45,12 @@ class JellyfinMediaTree(
                 RANDOM_ALBUMS -> itemFactory.randomAlbums()
                 FAVOURITES -> itemFactory.favourites()
                 PLAYLISTS -> itemFactory.playlists()
-                else -> {
-                    val response = api.userLibraryApi.getItem(id.toUUID())
-                    itemFactory.create(response.content)
-                }
+                OFFLINE_DOWNLOADS -> itemFactory.offlineDownloads()
+                else ->
+                    offlineDownloads.findCompletedMediaItem(id) ?: run {
+                        val response = api.userLibraryApi.getItem(id.toUUID())
+                        itemFactory.create(response.content)
+                    }
             }
 
             mediaItems.put(id, newItem)
@@ -60,8 +65,15 @@ class JellyfinMediaTree(
                 getItem(LATEST_ALBUMS),
                 getItem(RANDOM_ALBUMS),
                 getItem(FAVOURITES),
-                getItem(PLAYLISTS)
+                getItem(PLAYLISTS),
+                getItem(OFFLINE_DOWNLOADS),
             )
+
+            OFFLINE_DOWNLOADS -> {
+                val items = offlineDownloads.listCompletedMediaItems()
+                items.forEach { mediaItems.put(it.mediaId, it) }
+                items
+            }
 
             LATEST_ALBUMS -> getLatestAlbums()
             RANDOM_ALBUMS -> getRandomAlbums()

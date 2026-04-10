@@ -9,6 +9,8 @@ import androidx.media3.common.Player.REPEAT_MODE_ONE
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.SessionCommand
+import be.bendardenne.jellyfin.aaos.JellyfinMediaLibrarySessionCallback.Companion.DOWNLOAD_OFFLINE_COMMAND
+import be.bendardenne.jellyfin.aaos.JellyfinMediaLibrarySessionCallback.Companion.REMOVE_OFFLINE_COMMAND
 import be.bendardenne.jellyfin.aaos.JellyfinMediaLibrarySessionCallback.Companion.REPEAT_COMMAND
 import be.bendardenne.jellyfin.aaos.JellyfinMediaLibrarySessionCallback.Companion.SHUFFLE_COMMAND
 import com.google.common.collect.ImmutableList
@@ -47,7 +49,19 @@ object CommandButtons {
             .setSlots(CommandButton.SLOT_OVERFLOW)
             .build()
 
-        return ImmutableList.of(shuffle, repeat)
+        val downloadOffline = CommandButton.Builder(CommandButton.ICON_PLAYLIST_ADD)
+            .setDisplayName("Download for offline")
+            .setSessionCommand(SessionCommand(DOWNLOAD_OFFLINE_COMMAND, Bundle.EMPTY))
+            .setSlots(CommandButton.SLOT_OVERFLOW)
+            .build()
+
+        val removeOffline = CommandButton.Builder(CommandButton.ICON_PLAYLIST_REMOVE)
+            .setDisplayName("Remove offline copy")
+            .setSessionCommand(SessionCommand(REMOVE_OFFLINE_COMMAND, Bundle.EMPTY))
+            .setSlots(CommandButton.SLOT_OVERFLOW)
+            .build()
+
+        return ImmutableList.of(shuffle, repeat, downloadOffline, removeOffline)
     }
 
 }

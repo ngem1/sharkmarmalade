@@ -24,10 +24,14 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSession.ConnectionResult
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionError
+import androidx.media3.exoplayer.offline.DownloadRequest
+import androidx.media3.exoplayer.offline.DownloadService
 import androidx.media3.session.SessionResult
 import androidx.preference.PreferenceManager
 import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.PARENT_KEY
 import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.ROOT_ID
+import be.bendardenne.jellyfin.aaos.offline.JellyfinDownloadService
+import be.bendardenne.jellyfin.aaos.offline.OfflineDownloads
 import be.bendardenne.jellyfin.aaos.SharkMarmaladeConstants.LOG_MARKER
 import be.bendardenne.jellyfin.aaos.SharkMarmaladeConstants.PREF_ALBUM_BEHAVIOUR
 import be.bendardenne.jellyfin.aaos.SharkMarmaladeConstants.PREF_BITRATE
@@ -41,19 +45,24 @@ import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.userLibraryApi
 import org.jellyfin.sdk.model.serializer.toUUID
 import kotlin.collections.listOf
+import kotlin.text.Charsets
 
 
 @OptIn(UnstableApi::class)
 class JellyfinMediaLibrarySessionCallback(
     private val service: JellyfinMusicService,
     private val accountManager: JellyfinAccountManager,
-    private val jellyfinApi: ApiClient
+    private val jellyfinApi: ApiClient,
+    private val offlineDownloads: OfflineDownloads,
 ) : MediaLibraryService.MediaLibrarySession.Callback {
 
     companion object {
         const val LOGIN_COMMAND = "be.bendardenne.jellyfin.aaos.COMMAND.LOGIN"
         const val REPEAT_COMMAND = "be.bendardenne.jellyfin.aaos.COMMAND.REPEAT"
         const val SHUFFLE_COMMAND = "be.bendardenne.jellyfin.aaos.COMMAND.SHUFFLE"
+        const val DOWNLOAD_OFFLINE_COMMAND = "be.bendardenne.jellyfin.aaos.COMMAND.DOWNLOAD_OFFLINE"
+        const val REMOVE_OFFLINE_COMMAND = "be.bendardenne.jellyfin.aaos.COMMAND.REMOVE_OFFLINE"
+        const val EXTRA_MEDIA_ID = "media_id"
 
         const val PLAYLIST_IDS_PREF = "playlistIds"
         const val PLAYLIST_INDEX_PREF = "playlistIndex"
@@ -99,6 +108,8 @@ class JellyfinMediaLibrarySessionCallback(
             .add(SessionCommand(LOGIN_COMMAND, Bundle()))
             .add(SessionCommand(REPEAT_COMMAND, Bundle()))
             .add(SessionCommand(SHUFFLE_COMMAND, Bundle()))
+            .add(SessionCommand(DOWNLOAD_OFFLINE_COMMAND, Bundle()))
+            .add(SessionCommand(REMOVE_OFFLINE_COMMAND, Bundle()))
             .build()
 
         return ConnectionResult.accept(
@@ -140,7 +151,7 @@ class JellyfinMediaLibrarySessionCallback(
             Log.d(LOG_MARKER, "Art size hint from system: $artSize")
 
             val itemFactory = MediaItemFactory(service, jellyfinApi, artSize)
-            tree = JellyfinMediaTree(service, jellyfinApi, itemFactory)
+            tree = JellyfinMediaTree(service, jellyfinApi, itemFactory, offlineDownloads)
         }
 
         return SuspendToFutureAdapter.launchFuture {
@@ -380,6 +391,52 @@ class JellyfinMediaLibrarySessionCallback(
             SHUFFLE_COMMAND -> {
                 session.player.shuffleModeEnabled = !session.player.shuffleModeEnabled
                 session.setMediaButtonPreferences(CommandButtons.createButtons(session.player))
+                return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+            }
+
+            DOWNLOAD_OFFLINE_COMMAND -> {
+                val mediaId =
+                    args.getString(EXTRA_MEDIA_ID) ?: session.player.currentMediaItem?.mediaId
+                if (mediaId.isNullOrBlank() || !accountManager.isAuthenticated) {
+                    return Futures.immediateFuture(
+                        SessionResult(SessionResult.RESULT_ERROR_SESSION_ERROR),
+                    )
+                }
+                return SuspendToFutureAdapter.launchFuture {
+                    val item = tree.getItem(mediaId)
+                    val uri = item.localConfiguration?.uri
+                    if (uri == null) {
+                        SessionResult(SessionResult.RESULT_ERROR_SESSION_ERROR)
+                    } else {
+                        val title = item.mediaMetadata.title?.toString() ?: mediaId
+                        val request = DownloadRequest.Builder(mediaId, uri)
+                            .setData(title.toByteArray(Charsets.UTF_8))
+                            .build()
+                        DownloadService.sendAddDownload(
+                            service,
+                            JellyfinDownloadService::class.java,
+                            request,
+                            false,
+                        )
+                        SessionResult(SessionResult.RESULT_SUCCESS)
+                    }
+                }
+            }
+
+            REMOVE_OFFLINE_COMMAND -> {
+                val mediaId =
+                    args.getString(EXTRA_MEDIA_ID) ?: session.player.currentMediaItem?.mediaId
+                if (mediaId.isNullOrBlank()) {
+                    return Futures.immediateFuture(
+                        SessionResult(SessionResult.RESULT_ERROR_SESSION_ERROR),
+                    )
+                }
+                DownloadService.sendRemoveDownload(
+                    service,
+                    JellyfinDownloadService::class.java,
+                    mediaId,
+                    false,
+                )
                 return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
             }
         }

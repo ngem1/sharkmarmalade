@@ -37,6 +37,7 @@ class MediaItemFactory(
         const val RANDOM_ALBUMS = "RANDOM_ALBUMS_ID"
         const val FAVOURITES = "FAVOURITES_ID"
         const val PLAYLISTS = "PLAYLISTS_ID"
+        const val OFFLINE_DOWNLOADS = "OFFLINE_DOWNLOADS_ID"
         const val PARENT_KEY = "PARENT_KEY"
     }
 
@@ -107,6 +108,28 @@ class MediaItemFactory(
 
         return MediaItem.Builder()
             .setMediaId(FAVOURITES)
+            .setMediaMetadata(metadata)
+            .build()
+    }
+
+    fun offlineDownloads(): MediaItem {
+        val extras = Bundle()
+        extras.putInt(
+            MediaConstants.EXTRAS_KEY_CONTENT_STYLE_PLAYABLE,
+            MediaConstants.EXTRAS_VALUE_CONTENT_STYLE_LIST_ITEM,
+        )
+
+        val metadata = MediaMetadata.Builder()
+            .setTitle(context.getString(R.string.offline_downloads))
+            .setIsBrowsable(true)
+            .setIsPlayable(false)
+            .setArtworkUri("android.resource://be.bendardenne.jellyfin.aaos/drawable/app_logo".toUri())
+            .setExtras(extras)
+            .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_MIXED)
+            .build()
+
+        return MediaItem.Builder()
+            .setMediaId(OFFLINE_DOWNLOADS)
             .setMediaMetadata(metadata)
             .build()
     }
