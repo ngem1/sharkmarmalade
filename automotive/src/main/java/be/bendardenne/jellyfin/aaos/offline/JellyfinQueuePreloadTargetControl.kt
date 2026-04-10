@@ -7,9 +7,10 @@ import androidx.media3.exoplayer.source.preload.TargetPreloadStatusControl
 import kotlin.math.abs
 
 /**
- * [TargetPreloadStatusControl] for Jellyfin queue playback: pre-cache the next and previous
- * tracks (and lighter stages for neighbors) into the shared [androidx.media3.datasource.cache.Cache]
- * so [androidx.media3.datasource.cache.CacheDataSource] hits during real playback.
+ * [TargetPreloadStatusControl] for Jellyfin queue playback: pre-buffer the next and previous
+ * tracks via [DefaultPreloadManager.PreloadStatus.specifiedRangeLoaded] so loading uses the same
+ * [androidx.media3.exoplayer.source.MediaSource.Factory] as playback (including Jellyfin auth).
+ * Playback still uses a cache-backed data source so streamed bytes can populate the shared cache.
  */
 @OptIn(UnstableApi::class)
 class JellyfinQueuePreloadTargetControl : TargetPreloadStatusControl<Int, DefaultPreloadManager.PreloadStatus> {
@@ -21,10 +22,10 @@ class JellyfinQueuePreloadTargetControl : TargetPreloadStatusControl<Int, Defaul
         val delta = index - currentPlayingIndex
         return when {
             delta == 1 ->
-                DefaultPreloadManager.PreloadStatus.specifiedRangeCached(60_000L)
+                DefaultPreloadManager.PreloadStatus.specifiedRangeLoaded(60_000L)
 
             delta == -1 ->
-                DefaultPreloadManager.PreloadStatus.specifiedRangeCached(45_000L)
+                DefaultPreloadManager.PreloadStatus.specifiedRangeLoaded(45_000L)
 
             abs(delta) == 2 ->
                 DefaultPreloadManager.PreloadStatus.PRELOAD_STATUS_TRACKS_SELECTED

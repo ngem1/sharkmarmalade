@@ -11,9 +11,11 @@ import androidx.media3.common.AudioAttributes
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadManager
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.source.preload.DefaultPreloadManager
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
@@ -93,9 +95,13 @@ class JellyfinMusicService : MediaLibraryService() {
         jellyfinApi = jellyfin.createApi()
 
         preloadTargetControl = JellyfinQueuePreloadTargetControl()
-        val preloadBuilder = DefaultPreloadManager.Builder(this, preloadTargetControl)
+        val cacheDataSourceFactory = CacheDataSource.Factory()
             .setCache(offlineDownloads.sharedMediaCache())
-            .setDataSourceFactory(offlineDownloads.upstreamHttpDataSourceFactory())
+            .setUpstreamDataSourceFactory(offlineDownloads.upstreamHttpDataSourceFactory())
+        val mediaSourceFactory = DefaultMediaSourceFactory(this)
+            .setDataSourceFactory(cacheDataSourceFactory)
+        val preloadBuilder = DefaultPreloadManager.Builder(this, preloadTargetControl)
+            .setMediaSourceFactory(mediaSourceFactory)
 
         val player = preloadBuilder.buildExoPlayer(
             ExoPlayer.Builder(this).setAudioAttributes(AudioAttributes.DEFAULT, true),
