@@ -397,16 +397,21 @@ class JellyfinMediaLibrarySessionCallback(
             DOWNLOAD_OFFLINE_COMMAND -> {
                 val mediaId =
                     args.getString(EXTRA_MEDIA_ID) ?: session.player.currentMediaItem?.mediaId
-                if (mediaId.isNullOrBlank() || !accountManager.isAuthenticated) {
+                if (mediaId.isNullOrBlank()) {
                     return Futures.immediateFuture(
-                        SessionResult(SessionResult.RESULT_ERROR_SESSION_ERROR),
+                        SessionResult(SessionResult.RESULT_ERROR_BAD_VALUE),
+                    )
+                }
+                if (!accountManager.isAuthenticated) {
+                    return Futures.immediateFuture(
+                        SessionResult(SessionResult.RESULT_ERROR_SESSION_AUTHENTICATION_EXPIRED),
                     )
                 }
                 return SuspendToFutureAdapter.launchFuture {
                     val item = tree.getItem(mediaId)
                     val uri = item.localConfiguration?.uri
                     if (uri == null) {
-                        SessionResult(SessionResult.RESULT_ERROR_SESSION_ERROR)
+                        SessionResult(SessionResult.RESULT_ERROR_BAD_VALUE)
                     } else {
                         val title = item.mediaMetadata.title?.toString() ?: mediaId
                         val request = DownloadRequest.Builder(mediaId, uri)
@@ -428,7 +433,7 @@ class JellyfinMediaLibrarySessionCallback(
                     args.getString(EXTRA_MEDIA_ID) ?: session.player.currentMediaItem?.mediaId
                 if (mediaId.isNullOrBlank()) {
                     return Futures.immediateFuture(
-                        SessionResult(SessionResult.RESULT_ERROR_SESSION_ERROR),
+                        SessionResult(SessionResult.RESULT_ERROR_BAD_VALUE),
                     )
                 }
                 DownloadService.sendRemoveDownload(
