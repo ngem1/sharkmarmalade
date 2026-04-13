@@ -97,10 +97,19 @@
                 android:resource="@xml/authenticator" />
         </service>
 
+        <!-- Must match applicationId (substituted by AGP). Avoids stale be.bendardenne.* in merged manifest. -->
         <provider
             android:name=".AlbumArtContentProvider"
-            android:authorities="com.ngem1.sharkmarmalade"
+            android:authorities="${applicationId}"
             android:exported="true" />
+
+        <!-- Library default uses ${applicationId}.androidx-startup; force replace so upload matches current applicationId. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge"
+            tools:replace="android:authorities" />
 
     </application>
 </manifest>

@@ -3,6 +3,7 @@ package com.ngem1.sharkmarmalade
 import android.content.ContentProvider
 import android.content.ContentResolver
 import android.content.ContentValues
+import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.os.ParcelFileDescriptor
@@ -29,11 +30,11 @@ class AlbumArtContentProvider : ContentProvider() {
         private val uriMap = mutableMapOf<Uri, Uri>()
         private val inProgress = HashMap<Uri, CountDownLatch>()
 
-        fun mapUri(uri: Uri): Uri {
+        fun mapUri(context: Context, uri: Uri): Uri {
             val path = uri.encodedPath?.substring(1)?.replace('/', ':') ?: return Uri.EMPTY
             val contentUri = Uri.Builder()
                 .scheme(ContentResolver.SCHEME_CONTENT)
-                .authority("com.ngem1.sharkmarmalade")
+                .authority(context.packageName)
                 .path(path)
                 .build()
             uriMap[contentUri] = uri

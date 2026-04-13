@@ -307,7 +307,7 @@ class MediaItemFactory(
             maxWidth = artSize,
             maxHeight = artSize,
         )
-        val localUrl = AlbumArtContentProvider.mapUri(artUrl.toUri())
+        val localUrl = AlbumArtContentProvider.mapUri(context, artUrl.toUri())
         return localUrl
     }
 
