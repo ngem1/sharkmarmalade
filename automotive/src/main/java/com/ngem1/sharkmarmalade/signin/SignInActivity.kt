@@ -1,4 +1,4 @@
-package be.bendardenne.jellyfin.aaos.signin
+package com.ngem1.sharkmarmalade.signin
 
 import android.content.ComponentName
 import android.os.Bundle
@@ -9,9 +9,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionToken
-import be.bendardenne.jellyfin.aaos.JellyfinMediaLibrarySessionCallback.Companion.LOGIN_COMMAND
-import be.bendardenne.jellyfin.aaos.JellyfinMusicService
-import be.bendardenne.jellyfin.aaos.R
+import com.ngem1.sharkmarmalade.JellyfinMediaLibrarySessionCallback.Companion.LOGIN_COMMAND
+import com.ngem1.sharkmarmalade.JellyfinMusicService
+import com.ngem1.sharkmarmalade.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

@@ -1,4 +1,4 @@
-package be.bendardenne.jellyfin.aaos
+package com.ngem1.sharkmarmalade
 
 import android.os.Bundle
 import androidx.annotation.OptIn
@@ -9,10 +9,10 @@ import androidx.media3.common.Player.REPEAT_MODE_ONE
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.CommandButton
 import androidx.media3.session.SessionCommand
-import be.bendardenne.jellyfin.aaos.JellyfinMediaLibrarySessionCallback.Companion.DOWNLOAD_OFFLINE_COMMAND
-import be.bendardenne.jellyfin.aaos.JellyfinMediaLibrarySessionCallback.Companion.REMOVE_OFFLINE_COMMAND
-import be.bendardenne.jellyfin.aaos.JellyfinMediaLibrarySessionCallback.Companion.REPEAT_COMMAND
-import be.bendardenne.jellyfin.aaos.JellyfinMediaLibrarySessionCallback.Companion.SHUFFLE_COMMAND
+import com.ngem1.sharkmarmalade.JellyfinMediaLibrarySessionCallback.Companion.DOWNLOAD_OFFLINE_COMMAND
+import com.ngem1.sharkmarmalade.JellyfinMediaLibrarySessionCallback.Companion.REMOVE_OFFLINE_COMMAND
+import com.ngem1.sharkmarmalade.JellyfinMediaLibrarySessionCallback.Companion.REPEAT_COMMAND
+import com.ngem1.sharkmarmalade.JellyfinMediaLibrarySessionCallback.Companion.SHUFFLE_COMMAND
 import com.google.common.collect.ImmutableList
 
 /**

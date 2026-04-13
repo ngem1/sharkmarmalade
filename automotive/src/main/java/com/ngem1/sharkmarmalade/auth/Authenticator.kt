@@ -1,4 +1,4 @@
-package be.bendardenne.jellyfin.aaos.auth
+package com.ngem1.sharkmarmalade.auth
 
 import android.accounts.AbstractAccountAuthenticator
 import android.accounts.Account
@@ -7,12 +7,12 @@ import android.accounts.AccountManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import be.bendardenne.jellyfin.aaos.signin.SignInActivity
+import com.ngem1.sharkmarmalade.signin.SignInActivity
 
 class Authenticator(val context: Context) : AbstractAccountAuthenticator(context) {
     companion object {
-        const val ACCOUNT_TYPE = "be.bendardenne.jellyfin.aaos"
-        const val AUTHTOKEN_TYPE = "be.bendardenne.jellyfin.aaos"
+        const val ACCOUNT_TYPE = "com.ngem1.sharkmarmalade"
+        const val AUTHTOKEN_TYPE = "com.ngem1.sharkmarmalade"
     }
 
     override fun editProperties(p0: AccountAuthenticatorResponse?, p1: String?): Bundle =

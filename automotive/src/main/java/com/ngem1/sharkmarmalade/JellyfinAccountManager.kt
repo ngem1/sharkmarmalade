@@ -1,9 +1,9 @@
-package be.bendardenne.jellyfin.aaos
+package com.ngem1.sharkmarmalade
 
 import android.accounts.Account
 import android.accounts.AccountManager
 import android.os.Bundle
-import be.bendardenne.jellyfin.aaos.auth.Authenticator
+import com.ngem1.sharkmarmalade.auth.Authenticator
 
 class JellyfinAccountManager(private val accountManager: AccountManager) {
 

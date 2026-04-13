@@ -1,4 +1,4 @@
-package be.bendardenne.jellyfin.aaos
+package com.ngem1.sharkmarmalade
 
 import android.accounts.AccountManager
 import android.content.Context

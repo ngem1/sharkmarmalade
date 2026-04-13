@@ -1,4 +1,4 @@
-package be.bendardenne.jellyfin.aaos.offline
+package com.ngem1.sharkmarmalade.offline
 
 import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi

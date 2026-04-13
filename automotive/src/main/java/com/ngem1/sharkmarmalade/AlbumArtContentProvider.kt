@@ -1,4 +1,4 @@
-package be.bendardenne.jellyfin.aaos
+package com.ngem1.sharkmarmalade
 
 import android.content.ContentProvider
 import android.content.ContentResolver
@@ -7,7 +7,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.util.Log
-import be.bendardenne.jellyfin.aaos.SharkMarmaladeConstants.LOG_MARKER
+import com.ngem1.sharkmarmalade.SharkMarmaladeConstants.LOG_MARKER
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okio.buffer
@@ -33,7 +33,7 @@ class AlbumArtContentProvider : ContentProvider() {
             val path = uri.encodedPath?.substring(1)?.replace('/', ':') ?: return Uri.EMPTY
             val contentUri = Uri.Builder()
                 .scheme(ContentResolver.SCHEME_CONTENT)
-                .authority("be.bendardenne.jellyfin.aaos")
+                .authority("com.ngem1.sharkmarmalade")
                 .path(path)
                 .build()
             uriMap[contentUri] = uri

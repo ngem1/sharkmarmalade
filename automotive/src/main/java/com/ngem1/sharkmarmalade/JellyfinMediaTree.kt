@@ -1,16 +1,16 @@
-package be.bendardenne.jellyfin.aaos
+package com.ngem1.sharkmarmalade
 
 import android.content.Context
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_ARTIST
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_PLAYLIST
-import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.FAVOURITES
-import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.LATEST_ALBUMS
-import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.OFFLINE_DOWNLOADS
-import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.PLAYLISTS
-import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.RANDOM_ALBUMS
-import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.ROOT_ID
-import be.bendardenne.jellyfin.aaos.offline.OfflineDownloads
+import com.ngem1.sharkmarmalade.MediaItemFactory.Companion.FAVOURITES
+import com.ngem1.sharkmarmalade.MediaItemFactory.Companion.LATEST_ALBUMS
+import com.ngem1.sharkmarmalade.MediaItemFactory.Companion.OFFLINE_DOWNLOADS
+import com.ngem1.sharkmarmalade.MediaItemFactory.Companion.PLAYLISTS
+import com.ngem1.sharkmarmalade.MediaItemFactory.Companion.RANDOM_ALBUMS
+import com.ngem1.sharkmarmalade.MediaItemFactory.Companion.ROOT_ID
+import com.ngem1.sharkmarmalade.offline.OfflineDownloads
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import org.jellyfin.sdk.api.client.ApiClient

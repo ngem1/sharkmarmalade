@@ -1,4 +1,4 @@
-package be.bendardenne.jellyfin.aaos.offline
+package com.ngem1.sharkmarmalade.offline
 
 import android.app.Notification
 import androidx.annotation.OptIn
@@ -9,7 +9,7 @@ import androidx.media3.exoplayer.offline.DownloadNotificationHelper
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.media3.exoplayer.scheduler.PlatformScheduler
 import androidx.media3.exoplayer.scheduler.Scheduler
-import be.bendardenne.jellyfin.aaos.R
+import com.ngem1.sharkmarmalade.R
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

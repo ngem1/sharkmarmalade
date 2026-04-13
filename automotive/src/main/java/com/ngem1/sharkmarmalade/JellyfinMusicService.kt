@@ -1,4 +1,4 @@
-package be.bendardenne.jellyfin.aaos
+package com.ngem1.sharkmarmalade
 
 import android.accounts.AccountManager
 import android.os.Handler
@@ -20,13 +20,13 @@ import androidx.media3.exoplayer.source.preload.DefaultPreloadManager
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import androidx.preference.PreferenceManager
-import be.bendardenne.jellyfin.aaos.JellyfinMediaLibrarySessionCallback.Companion.PLAYLIST_INDEX_PREF
-import be.bendardenne.jellyfin.aaos.JellyfinMediaLibrarySessionCallback.Companion.PLAYLIST_TRACK_POSITON_MS_PREF
-import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.OFFLINE_DOWNLOADS
-import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.ROOT_ID
-import be.bendardenne.jellyfin.aaos.offline.JellyfinQueuePreloadTargetControl
-import be.bendardenne.jellyfin.aaos.offline.OfflineDownloads
-import be.bendardenne.jellyfin.aaos.SharkMarmaladeConstants.LOG_MARKER
+import com.ngem1.sharkmarmalade.JellyfinMediaLibrarySessionCallback.Companion.PLAYLIST_INDEX_PREF
+import com.ngem1.sharkmarmalade.JellyfinMediaLibrarySessionCallback.Companion.PLAYLIST_TRACK_POSITON_MS_PREF
+import com.ngem1.sharkmarmalade.MediaItemFactory.Companion.OFFLINE_DOWNLOADS
+import com.ngem1.sharkmarmalade.MediaItemFactory.Companion.ROOT_ID
+import com.ngem1.sharkmarmalade.offline.JellyfinQueuePreloadTargetControl
+import com.ngem1.sharkmarmalade.offline.OfflineDownloads
+import com.ngem1.sharkmarmalade.SharkMarmaladeConstants.LOG_MARKER
 import dagger.hilt.android.AndroidEntryPoint
 import org.jellyfin.sdk.Jellyfin
 import org.jellyfin.sdk.api.client.ApiClient

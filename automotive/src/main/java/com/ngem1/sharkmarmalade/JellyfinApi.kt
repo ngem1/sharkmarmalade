@@ -1,4 +1,4 @@
-package be.bendardenne.jellyfin.aaos
+package com.ngem1.sharkmarmalade
 
 import org.jellyfin.sdk.api.client.ApiClient
 

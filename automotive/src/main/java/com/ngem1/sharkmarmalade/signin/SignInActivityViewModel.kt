@@ -1,12 +1,12 @@
-package be.bendardenne.jellyfin.aaos.signin
+package com.ngem1.sharkmarmalade.signin
 
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import be.bendardenne.jellyfin.aaos.JellyfinAccountManager
-import be.bendardenne.jellyfin.aaos.SharkMarmaladeConstants.LOG_MARKER
+import com.ngem1.sharkmarmalade.JellyfinAccountManager
+import com.ngem1.sharkmarmalade.SharkMarmaladeConstants.LOG_MARKER
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

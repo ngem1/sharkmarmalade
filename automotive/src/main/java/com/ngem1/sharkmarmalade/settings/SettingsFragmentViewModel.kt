@@ -1,11 +1,11 @@
-package be.bendardenne.jellyfin.aaos.settings
+package com.ngem1.sharkmarmalade.settings
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import be.bendardenne.jellyfin.aaos.JellyfinAccountManager
-import be.bendardenne.jellyfin.aaos.SharkMarmaladeConstants.LOG_MARKER
-import be.bendardenne.jellyfin.aaos.auth
+import com.ngem1.sharkmarmalade.JellyfinAccountManager
+import com.ngem1.sharkmarmalade.SharkMarmaladeConstants.LOG_MARKER
+import com.ngem1.sharkmarmalade.auth
 import com.google.common.base.Strings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

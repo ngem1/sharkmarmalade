@@ -1,4 +1,4 @@
-package be.bendardenne.jellyfin.aaos
+package com.ngem1.sharkmarmalade
 
 object SharkMarmaladeConstants {
     const val LOG_MARKER = "SharkMarmalade"

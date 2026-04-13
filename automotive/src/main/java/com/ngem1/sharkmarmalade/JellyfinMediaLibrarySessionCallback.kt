@@ -1,4 +1,4 @@
-package be.bendardenne.jellyfin.aaos
+package com.ngem1.sharkmarmalade
 
 import android.app.PendingIntent
 import android.content.Intent
@@ -28,14 +28,14 @@ import androidx.media3.exoplayer.offline.DownloadRequest
 import androidx.media3.exoplayer.offline.DownloadService
 import androidx.media3.session.SessionResult
 import androidx.preference.PreferenceManager
-import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.PARENT_KEY
-import be.bendardenne.jellyfin.aaos.MediaItemFactory.Companion.ROOT_ID
-import be.bendardenne.jellyfin.aaos.offline.JellyfinDownloadService
-import be.bendardenne.jellyfin.aaos.offline.OfflineDownloads
-import be.bendardenne.jellyfin.aaos.SharkMarmaladeConstants.LOG_MARKER
-import be.bendardenne.jellyfin.aaos.SharkMarmaladeConstants.PREF_ALBUM_BEHAVIOUR
-import be.bendardenne.jellyfin.aaos.SharkMarmaladeConstants.PREF_BITRATE
-import be.bendardenne.jellyfin.aaos.signin.SignInActivity
+import com.ngem1.sharkmarmalade.MediaItemFactory.Companion.PARENT_KEY
+import com.ngem1.sharkmarmalade.MediaItemFactory.Companion.ROOT_ID
+import com.ngem1.sharkmarmalade.offline.JellyfinDownloadService
+import com.ngem1.sharkmarmalade.offline.OfflineDownloads
+import com.ngem1.sharkmarmalade.SharkMarmaladeConstants.LOG_MARKER
+import com.ngem1.sharkmarmalade.SharkMarmaladeConstants.PREF_ALBUM_BEHAVIOUR
+import com.ngem1.sharkmarmalade.SharkMarmaladeConstants.PREF_BITRATE
+import com.ngem1.sharkmarmalade.signin.SignInActivity
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
@@ -57,11 +57,11 @@ class JellyfinMediaLibrarySessionCallback(
 ) : MediaLibraryService.MediaLibrarySession.Callback {
 
     companion object {
-        const val LOGIN_COMMAND = "be.bendardenne.jellyfin.aaos.COMMAND.LOGIN"
-        const val REPEAT_COMMAND = "be.bendardenne.jellyfin.aaos.COMMAND.REPEAT"
-        const val SHUFFLE_COMMAND = "be.bendardenne.jellyfin.aaos.COMMAND.SHUFFLE"
-        const val DOWNLOAD_OFFLINE_COMMAND = "be.bendardenne.jellyfin.aaos.COMMAND.DOWNLOAD_OFFLINE"
-        const val REMOVE_OFFLINE_COMMAND = "be.bendardenne.jellyfin.aaos.COMMAND.REMOVE_OFFLINE"
+        const val LOGIN_COMMAND = "com.ngem1.sharkmarmalade.COMMAND.LOGIN"
+        const val REPEAT_COMMAND = "com.ngem1.sharkmarmalade.COMMAND.REPEAT"
+        const val SHUFFLE_COMMAND = "com.ngem1.sharkmarmalade.COMMAND.SHUFFLE"
+        const val DOWNLOAD_OFFLINE_COMMAND = "com.ngem1.sharkmarmalade.COMMAND.DOWNLOAD_OFFLINE"
+        const val REMOVE_OFFLINE_COMMAND = "com.ngem1.sharkmarmalade.COMMAND.REMOVE_OFFLINE"
         const val EXTRA_MEDIA_ID = "media_id"
 
         const val PLAYLIST_IDS_PREF = "playlistIds"

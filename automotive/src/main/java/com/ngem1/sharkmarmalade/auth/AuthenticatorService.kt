@@ -1,4 +1,4 @@
-package be.bendardenne.jellyfin.aaos.auth
+package com.ngem1.sharkmarmalade.auth
 
 import android.app.Service
 import android.content.Intent

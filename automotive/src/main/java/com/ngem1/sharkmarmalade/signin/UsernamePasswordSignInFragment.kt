@@ -1,4 +1,4 @@
-package be.bendardenne.jellyfin.aaos.signin
+package com.ngem1.sharkmarmalade.signin
 
 import android.os.Bundle
 import android.text.TextUtils
@@ -14,8 +14,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import be.bendardenne.jellyfin.aaos.R
-import be.bendardenne.jellyfin.aaos.signin.SignInActivityViewModel.Companion.JELLYFIN_SERVER_URL
+import com.ngem1.sharkmarmalade.R
+import com.ngem1.sharkmarmalade.signin.SignInActivityViewModel.Companion.JELLYFIN_SERVER_URL
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 

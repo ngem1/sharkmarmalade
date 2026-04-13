@@ -1,4 +1,4 @@
-package be.bendardenne.jellyfin.aaos.offline
+package com.ngem1.sharkmarmalade.offline
 
 import android.content.Context
 import androidx.annotation.OptIn
@@ -13,8 +13,8 @@ import androidx.media3.datasource.cache.NoOpCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.offline.Download
 import androidx.media3.exoplayer.offline.DownloadManager
-import be.bendardenne.jellyfin.aaos.JellyfinAccountManager
-import be.bendardenne.jellyfin.aaos.auth
+import com.ngem1.sharkmarmalade.JellyfinAccountManager
+import com.ngem1.sharkmarmalade.auth
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.jellyfin.sdk.Jellyfin
 import java.io.File

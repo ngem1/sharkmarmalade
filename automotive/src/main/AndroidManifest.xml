@@ -99,7 +99,7 @@
 
         <provider
             android:name=".AlbumArtContentProvider"
-            android:authorities="be.bendardenne.jellyfin.aaos"
+            android:authorities="com.ngem1.sharkmarmalade"
             android:exported="true" />
 
     </application>

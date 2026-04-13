@@ -1,4 +1,4 @@
-package be.bendardenne.jellyfin.aaos
+package com.ngem1.sharkmarmalade
 
 import android.content.Context
 import android.net.Uri
@@ -11,11 +11,11 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaConstants
 import androidx.preference.PreferenceManager
-import be.bendardenne.jellyfin.aaos.SharkMarmaladeConstants.DIRECT_STREAM
-import be.bendardenne.jellyfin.aaos.SharkMarmaladeConstants.EXPAND
-import be.bendardenne.jellyfin.aaos.SharkMarmaladeConstants.PLAY
-import be.bendardenne.jellyfin.aaos.SharkMarmaladeConstants.PREF_ALBUM_BEHAVIOUR
-import be.bendardenne.jellyfin.aaos.SharkMarmaladeConstants.PREF_BITRATE
+import com.ngem1.sharkmarmalade.SharkMarmaladeConstants.DIRECT_STREAM
+import com.ngem1.sharkmarmalade.SharkMarmaladeConstants.EXPAND
+import com.ngem1.sharkmarmalade.SharkMarmaladeConstants.PLAY
+import com.ngem1.sharkmarmalade.SharkMarmaladeConstants.PREF_ALBUM_BEHAVIOUR
+import com.ngem1.sharkmarmalade.SharkMarmaladeConstants.PREF_BITRATE
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.extensions.universalAudioApi
 import org.jellyfin.sdk.api.operations.ImageApi
@@ -79,7 +79,7 @@ class MediaItemFactory(
             .setTitle(label)
             .setIsBrowsable(true)
             .setIsPlayable(false)
-            .setArtworkUri("android.resource://be.bendardenne.jellyfin.aaos/drawable/$icon".toUri())
+            .setArtworkUri("android.resource://com.ngem1.sharkmarmalade/drawable/$icon".toUri())
             .setExtras(extras)
             .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_ALBUMS)
             .build()
@@ -101,7 +101,7 @@ class MediaItemFactory(
             .setTitle("Favourites")
             .setIsBrowsable(true)
             .setIsPlayable(false)
-            .setArtworkUri("android.resource://be.bendardenne.jellyfin.aaos/drawable/star_filled".toUri())
+            .setArtworkUri("android.resource://com.ngem1.sharkmarmalade/drawable/star_filled".toUri())
             .setExtras(extras)
             .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_MIXED)
             .build()
@@ -123,7 +123,7 @@ class MediaItemFactory(
             .setTitle(context.getString(R.string.offline_downloads))
             .setIsBrowsable(true)
             .setIsPlayable(false)
-            .setArtworkUri("android.resource://be.bendardenne.jellyfin.aaos/drawable/app_logo".toUri())
+            .setArtworkUri("android.resource://com.ngem1.sharkmarmalade/drawable/app_logo".toUri())
             .setExtras(extras)
             .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_MIXED)
             .build()
@@ -145,7 +145,7 @@ class MediaItemFactory(
             .setTitle("Playlists")
             .setIsBrowsable(true)
             .setIsPlayable(false)
-            .setArtworkUri("android.resource://be.bendardenne.jellyfin.aaos/drawable/playlists".toUri())
+            .setArtworkUri("android.resource://com.ngem1.sharkmarmalade/drawable/playlists".toUri())
             .setExtras(extras)
             .setMediaType(MediaMetadata.MEDIA_TYPE_FOLDER_PLAYLISTS)
             .build()

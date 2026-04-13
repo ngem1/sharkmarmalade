@@ -1,10 +1,10 @@
-package be.bendardenne.jellyfin.aaos.settings
+package com.ngem1.sharkmarmalade.settings
 
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import be.bendardenne.jellyfin.aaos.R
-import be.bendardenne.jellyfin.aaos.databinding.ActivitySettingsBinding
+import com.ngem1.sharkmarmalade.R
+import com.ngem1.sharkmarmalade.databinding.ActivitySettingsBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 

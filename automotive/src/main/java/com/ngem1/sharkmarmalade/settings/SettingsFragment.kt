@@ -1,11 +1,11 @@
-package be.bendardenne.jellyfin.aaos.settings
+package com.ngem1.sharkmarmalade.settings
 
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import be.bendardenne.jellyfin.aaos.R
+import com.ngem1.sharkmarmalade.R
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
