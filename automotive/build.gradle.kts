@@ -7,15 +7,15 @@ plugins {
 }
 
 android {
-    namespace = "be.bendardenne.jellyfin.aaos"
+    namespace = "com.ngem1.sharkmarmalade"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "be.bendardenne.jellyfin.aaos"
+        applicationId = "com.ngem1.sharkmarmalade"
         minSdk = 29
         targetSdk = 34
-        versionCode = 38
-        versionName = "1.4"
+        versionCode = 39
+        versionName = "1.4.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
